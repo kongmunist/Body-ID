@@ -2,6 +2,7 @@ import serial
 import sys
 import threading
 import binascii
+import hashlib as hl
 from stringVersion import condense, findSmallest
 
 # Taken from my friend Sam, god bless his soul
@@ -28,6 +29,57 @@ class ReadLine:
             else:
                 self.buf.extend(data)
 
+class IdManager():
+    def __init__(self):
+        self.people = ["andy", "tom", "david", "vignesh"]
+        # self.peoplehash = {x:str(abs(hash(x))).ljust(20, "0") for x in self.people}
+        self.peoplehash = {x:'1'+ hl.md5(x.encode('utf-8')).hexdigest() for x in self.people}
+        print("Known people hashes:")
+        for name in self.people:
+            print("{} -> {}".format(name, self.getIDBinaryFromName(name)))
+        print("")
+        # peopleAscii = []
+
+    def getID(self, str):
+        return self.peoplehash[str]
+        # 3455203352929927801000000
+
+    def getIDBinaryFromName(self, str):
+        return self.getIDBinaryFromHash(self.peoplehash[str])
+
+    def getIDBinaryFromHash(self, str):
+        return ''.join(format(ord(i), 'b') for i in str)
+
+
+    def findClosestMatch(self, str):
+        str = str.ljust(33, "0")
+        read_b = self.getIDBinaryFromHash(str)
+
+        closest = None
+        minDist = 10000000000000
+        for name in self.peoplehash.keys():
+            candidate_b = self.getIDBinaryFromName(name)
+            dist = 0
+            for i in range(len(read_b)):
+                if read_b[i] != candidate_b[i]:
+                    dist+=1
+            if dist < minDist:
+                minDist = dist
+                closest = name
+        return closest
+
+
+            # dist = bitcount(val ^ str)
+
+
+
+
+
+
+
+
+
+
 
 # stoppable thread for serial tx/rx
 class SerialThread(threading.Thread):
@@ -39,6 +91,9 @@ class SerialThread(threading.Thread):
         self.FESData = None
         self.dataHolder = dataHolder
         self.data = []
+
+
+        self.peopleFinder = IdManager()
 
         self.i = 0
 
@@ -74,14 +129,16 @@ class SerialThread(threading.Thread):
                     self.dataHolder.append(int(self.serialData.strip()))
                     self.i += 1
                     if self.i % 20 == 0:
-                        tmp = "".join([str(x) for x in list(self.dataHolder)][:300])
-                        n = int(tmp,2)
+                        tmp = "".join([str(x) for x in list(self.dataHolder)][:500])
+                        # tmp = "".join([str(x) for x in list(self.dataHolder)])
+                        n = condense(tmp, findSmallest(tmp))
+                        n = int(n,2)
 
-                        # print(binascii.unhexlify('%x' % n))
-                        print(condense(tmp, findSmallest(tmp)))
-                        print("tmp", tmp)
+                        hex = binascii.unhexlify('%x' % n)
+                        tmpstring = "".join([chr(x) for x in hex if x >64 and x < 123])
+                        if len(tmpstring) > 2:
+                            print(tmpstring)
 
-                        # print("".join([str(x) for x in list(self.dataHolder)][:200]))
             except Exception as e:
                 pass
 

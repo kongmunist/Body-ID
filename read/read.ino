@@ -8,6 +8,7 @@ const int inPin = 8;
 //int pulldownpin = 7;
 float kiloh;
 float freq =10000;
+int yea;
 
 void setup() {
   // put your setup code here, to run once:
@@ -28,7 +29,24 @@ void loop() {
 //      Serial.println(isHigh(inPin));
 //      delayMicroseconds(kiloh);
 //  }
-  Serial.println(analogRead(A0) > 205);
+
+    yea = analogRead(A0);
+    while (yea < 200){
+      yea = analogRead(A0);
+//      delay(1);
+    }
+    
+    for (int i= 0; i < 500; i++){
+      yea = analogRead(A0);
+      if (yea >200){
+        Serial.println("1");
+      } else {
+        Serial.println("0");
+      }
+      delayMicroseconds(kiloh);
+  }
+
   
-   
+  
+
 }

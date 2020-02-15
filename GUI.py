@@ -80,7 +80,7 @@ class GUI(QMainWindow):
         horz = QHBoxLayout()
         self.vert1 = QVBoxLayout()
         self.horiz1 = QHBoxLayout()
-        self.textlabel1 = QRadioButton("Recording: Off")
+        self.textlabel1 = QRadioButton("Detecting: ")
         self.textlabel1.setEnabled(False)
 
 
@@ -130,7 +130,7 @@ class GUI(QMainWindow):
                 f.write(",".join([str(x) for x in self.saveData]))
 
             for i in range(100):
-                self.textlabel1.setText("Recording: Off")
+                self.textlabel1.setText("Detecting: ")
             print('set off')
         else:
             for i in range(100):

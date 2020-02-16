@@ -138,6 +138,7 @@ class SerialThread(threading.Thread):
                         tmpstring = "".join([chr(x) for x in hex if x >64 and x < 123])
                         if len(tmpstring) > 2:
                             print(tmpstring)
+                            print()
 
             except Exception as e:
                 pass
